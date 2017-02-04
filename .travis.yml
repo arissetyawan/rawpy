@@ -1,19 +1,26 @@
-language: objective-c
+os: osx
+language: generic
 
 env:
   global:
     #- LATEST_TAG=1
-    # PYPI_PASS for deployment
-    - secure: "oupMUSNsfPH+jGxLlRfembe6dwdrd85/GlpgIpNxgCURvrsFWZCQDUvgMn+IaBz97Meovb9SrgrADT4dg+86wJ7tAfEEnFTq8nwuFkC8A2fvFHMIKV9PvUx7VLooQWje1u2BbqBk2UwpV9h9lq4QenpJXp/lqIORJg3d7wHcHpY="
   matrix:
-    - VERSION=2.7.8
-    - VERSION=3.3.5
-    - VERSION=3.4.1
+    - PYTHON_VERSION=2.7
+      NUMPY_VERSION=1.7
+            
+    - PYTHON_VERSION=3.4
+      NUMPY_VERSION=1.8
+      
+    - PYTHON_VERSION=3.5
+      NUMPY_VERSION=1.9
+      
+    #- PYTHON_VERSION=3.6
+    #  NUMPY_VERSION=1.9
 
 install:
   - cd terryfy && git fetch && git checkout master && cd ..
   - source terryfy/travis_tools.sh
-  - travis_retry get_python_environment macpython $VERSION venv
+  - travis_retry get_python_environment macports $PYTHON_VERSION venv
   - if [ -n "$LATEST_TAG" ]; then 
       checkout_closest_tag rawpy ;
     else
@@ -24,12 +31,9 @@ install:
       cd .. ;
     fi
   - cd rawpy
-  # Cython doesn't have wheels on PyPI yet
-  - travis_retry pip install -f http://kerbin.bic.berkeley.edu/wheelhouse/ cython
-  # scikit-image 0.10.1 doesn't install six and scipy itself
-  - pip install six scipy
+  - travis_retry pip install numpy==$NUMPY_VERSION.*
   - travis_retry pip install -r dev-requirements.txt
-  - brew rm jpeg
+  - brew rm --ignore-dependencies jpeg
   - brew install --universal jpeg
   - export CC=clang
   - export CXX=clang++
@@ -48,7 +52,7 @@ install:
 
 script:
   # make sure it's working without any required libraries installed
-  - brew rm jpeg 
+  - brew rm --ignore-dependencies jpeg
   - mkdir tmp_for_test
   - cd tmp_for_test
   - nosetests --verbosity=3 --nocapture ../rawpy/test
@@ -58,5 +62,5 @@ after_success:
   - cd rawpy
   - "if [[ \"`git log -n 1 --pretty=format:'%d'`\" =~ \"tag: v\" ]]; then
        pip install twine ;
-       twine upload -u neothemachine -p $PYPI_PASS dist/* ;
+       twine upload -u letmaik -p $PYPI_PASS dist/* ;
      fi"
