@@ -32,6 +32,8 @@ install:
     fi
   - cd rawpy
   - travis_retry pip install numpy==$NUMPY_VERSION.*
+  # scikit-image requires scipy
+  - travis_retry pip install scipy
   - travis_retry pip install -r dev-requirements.txt
   - brew rm --ignore-dependencies jpeg
   - brew install --universal jpeg
