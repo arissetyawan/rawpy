@@ -1,6 +1,9 @@
 os: osx
 language: generic
 
+# use oldest available image to be as compatible as possible when producing wheels
+osx_image: xcode6.4 # = OS X 10.10 
+
 env:
   global:
     #- LATEST_TAG=1
