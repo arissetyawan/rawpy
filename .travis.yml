@@ -51,7 +51,6 @@ install:
   - delocate-listdeps --all dist/*.whl # lists library dependencies
   - delocate-wheel --require-archs=intel dist/*.whl # copies library dependencies into wheel
   - delocate-listdeps --all dist/*.whl # verify
-  - rename_wheels dist
   - pip install dist/*.whl
   - cd ..
 
