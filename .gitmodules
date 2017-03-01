@@ -1,6 +1,6 @@
 [submodule "rawpy"]
 	path = rawpy
-	url = git://github.com/neothemachine/rawpy.git
+	url = git://github.com/letmaik/rawpy.git
 	ignore = dirty
 [submodule "terryfy"]
 	path = terryfy
