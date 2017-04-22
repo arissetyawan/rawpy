@@ -43,8 +43,7 @@ install:
   - cd rawpy
   # necessary, otherwise the libraw submodule points to an old commit
   - git submodule update --recursive --init
-  - travis_retry pip install numpy==$NUMPY_VERSION
-  - travis_retry pip install scipy==$SCIPY_VERSION
+  - travis_retry pip install numpy==$NUMPY_VERSION scipy==$SCIPY_VERSION scikit-image
   - travis_retry pip install -r dev-requirements.txt
   - pip freeze
   - brew rm --ignore-dependencies jpeg
