@@ -8,17 +8,23 @@ env:
   global:
     #- LATEST_TAG=1
   matrix:
+    # for each Python version the SciPy version is the oldest one having a wheel available
+    # this avoids errors like: "module compiled against API version 9 but this version of numpy is 7""
     - PYTHON_VERSION=2.7
       NUMPY_VERSION=1.7.1 # 1.7.2 has no macOS wheels
+      SCIPY_VERSION=0.10.0
             
     - PYTHON_VERSION=3.4
       NUMPY_VERSION=1.8.*
+      SCIPY_VERSION=0.13.0
       
     - PYTHON_VERSION=3.5
       NUMPY_VERSION=1.9.*
+      SCIPY_VERSION=0.16.1
 
     - PYTHON_VERSION=3.6
       NUMPY_VERSION=1.11.*
+      SCIPY_VERSION=0.18.1
 
 install:
   - cd terryfy && git fetch && git checkout master && cd ..
@@ -36,7 +42,7 @@ install:
   - cd rawpy
   # necessary, otherwise the libraw submodule points to an old commit
   - git submodule update --recursive --init
-  - travis_retry pip install numpy==$NUMPY_VERSION
+  - travis_retry pip install scipy==$SCIPY_VERSION numpy==$NUMPY_VERSION
   - travis_retry pip install -r dev-requirements.txt
   - brew rm --ignore-dependencies jpeg
   - brew install jpeg
@@ -62,9 +68,12 @@ script:
   - nosetests --verbosity=3 --nocapture ../rawpy/test
   - cd ..
 
-after_success:
-  - cd rawpy
-  - "if [[ \"`git log -n 1 --pretty=format:'%d'`\" =~ \"tag: v\" ]]; then
-       pip install twine ;
-       twine upload -u letmaik -p $PYPI_PASS dist/* ;
-     fi"
+deploy:
+  provider: pypi
+  user: letmaik
+  skip_upload_docs: true
+  skip_cleanup: true
+  password:
+    secure: "Gi+qCKpRNFjlvpOxBXjSNAq4yDhlSXfUUl9RZaOSdER+YURbc9/AMlfUuyOvpi09tAgwGnn9Hn3z7NqqjNV9auTcD30viMnevNbiyJaE2O/bw75FU9HqFmTM/OR7UVJp4sNtxtXy1Zp5CxmMnzRCjV3stQ9iaG9aJOV3sbUzDTQ="
+  on:
+    tags: true
