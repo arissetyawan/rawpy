@@ -8,24 +8,28 @@ env:
   global:
     #- LATEST_TAG=1
   matrix:
-    # for each Python version the SciPy version is the oldest one having a wheel available
+    # for each Python version the SciPy & scikit-image versions are chosen which are the oldest having a wheel available
     # this avoids errors like: "module compiled against API version 9 but this version of numpy is 7""
     - PYTHON_VERSION=2.7
       NUMPY_VERSION=1.7.1
       SCIPY_VERSION=0.13.0
+      SKIMAGE_VERSION=0.10.1
       # (NumPy 1.7.2 has no macOS wheels)
             
     - PYTHON_VERSION=3.4
       NUMPY_VERSION=1.8.*
       SCIPY_VERSION=0.13.0
+      SKIMAGE_VERSION=0.10.1
       
     - PYTHON_VERSION=3.5
       NUMPY_VERSION=1.9.*
       SCIPY_VERSION=0.16.1
+      SKIMAGE_VERSION=0.12.3
 
     - PYTHON_VERSION=3.6
       NUMPY_VERSION=1.11.*
       SCIPY_VERSION=0.18.1
+      SKIMAGE_VERSION=0.13.0
 
 install:
   - cd terryfy && git fetch && git checkout master && cd ..
@@ -43,7 +47,7 @@ install:
   - cd rawpy
   # necessary, otherwise the libraw submodule points to an old commit
   - git submodule update --recursive --init
-  - travis_retry pip install numpy==$NUMPY_VERSION scipy==$SCIPY_VERSION scikit-image
+  - travis_retry pip install numpy==$NUMPY_VERSION scipy==$SCIPY_VERSION scikit-image==$SKIMAGE_VERSION
   - travis_retry pip install -r dev-requirements.txt
   - pip freeze
   - brew rm --ignore-dependencies jpeg
