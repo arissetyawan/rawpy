@@ -9,16 +9,16 @@ env:
     #- LATEST_TAG=1
   matrix:
     - PYTHON_VERSION=2.7
-      NUMPY_VERSION=1.7
+      NUMPY_VERSION=1.7.1 # 1.7.2 has no macOS wheels
             
     - PYTHON_VERSION=3.4
-      NUMPY_VERSION=1.8
+      NUMPY_VERSION=1.8.*
       
     - PYTHON_VERSION=3.5
-      NUMPY_VERSION=1.9
-      
-    #- PYTHON_VERSION=3.6
-    #  NUMPY_VERSION=1.9
+      NUMPY_VERSION=1.9.*
+
+    - PYTHON_VERSION=3.6
+      NUMPY_VERSION=1.11.*
 
 install:
   - cd terryfy && git fetch && git checkout master && cd ..
@@ -36,22 +36,20 @@ install:
   - cd rawpy
   # necessary, otherwise the libraw submodule points to an old commit
   - git submodule update --recursive --init
-  - travis_retry pip install numpy==$NUMPY_VERSION.*
-  # scikit-image requires scipy
-  - travis_retry pip install scipy
+  - travis_retry pip install numpy==$NUMPY_VERSION
   - travis_retry pip install -r dev-requirements.txt
   - brew rm --ignore-dependencies jpeg
-  - brew install --universal jpeg
+  - brew install jpeg
   - export CC=clang
   - export CXX=clang++
-  - export CFLAGS="-arch i386 -arch x86_64"
+  - export CFLAGS="-arch x86_64"
   - export CXXFLAGS=$CFLAGS
   - export LDFLAGS=$CFLAGS
   - export ARCHFLAGS=$CFLAGS
   - python setup.py bdist_wheel
   - pip install delocate
   - delocate-listdeps --all dist/*.whl # lists library dependencies
-  - delocate-wheel --require-archs=intel dist/*.whl # copies library dependencies into wheel
+  - delocate-wheel --require-archs=x86_64 dist/*.whl # copies library dependencies into wheel
   - delocate-listdeps --all dist/*.whl # verify
   - pip install dist/*.whl
   - cd ..
